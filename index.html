@@ -52,7 +52,7 @@ h2 .grad{background:linear-gradient(90deg,#009d00,#006bff 60%,#982cff);-webkit-b
 .points p{margin:0 0 30px;font-size:16px}.points p:last-child{margin:0}
 /* gray centered sections */
 .band-gray{background:var(--gray);padding:96px 0}
-.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}
+.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}.center p+p{margin-top:14px}
 .outlined{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 .outlined>*,.benefits .wrap>*{min-width:0}
 .ocard{border:2px solid var(--green);border-radius:16px;background:#fff;padding:32px 30px}
@@ -333,7 +333,8 @@ dialog.lightbox button{background:#fff;border:none;border-radius:40px;padding:7p
 
 <section class="band-gray" id="install"><div class="wrap">
   <div class="center"><h2>Add the Plug-in Catalog <span class="grad">once</span></h2>
-  <p>Add it once on either host, then install what you need. The plugin key is the same on both hosts: <code>&lt;plugin&gt;@exabeam</code>.</p></div>
+  <p>A single command adds Exabeam's entire Plug-in Catalog to your AI agent, so every supported plugin is available to you at once. It works the same way in Claude Code and OpenAI Codex, and you only need to do it once.</p>
+  <p>Each plugin has one install key in the format <code>&lt;plugin&gt;@exabeam</code>, and it's the same in both Claude Code and Codex. For example, the SOC plugin installs as <code>soc@exabeam</code> in either tool.</p></div>
   <div class="outlined">
     <div class="ocard"><button class="copy" type="button">Copy</button><h3>Claude Code</h3><pre>claude plugin marketplace add Exabeam-Labs/plugins</pre></div>
     <div class="ocard b"><button class="copy" type="button">Copy</button><h3>OpenAI Codex</h3><pre>codex plugin marketplace add Exabeam-Labs/plugins</pre></div>
