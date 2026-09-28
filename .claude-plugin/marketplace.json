@@ -5,7 +5,7 @@
     "url": "https://www.exabeam.com/"
   },
   "metadata": {
-    "description": "The Exabeam Plug-in Forge — stable, reviewed Exabeam plugins for AI agents. Add Exabeam's knowledge and capabilities to the AI agent of your choice, on your terms."
+    "description": "The Exabeam Plug-in Catalog — stable, reviewed Exabeam plugins for AI agents. Add Exabeam's knowledge and capabilities to the AI agent of your choice, on your terms."
   },
   "plugins": [
     {

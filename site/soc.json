@@ -1,0 +1,10 @@
+{
+  "status": "pre-release",
+  "media": [
+    {
+      "src": "soc/docs/diagram/guardrails-light.png",
+      "alt": "Runtime architecture of the Exabeam Agentic SOC plugin: the agent host calls a local bridge MCP that proxies to the Exabeam MCP, canonicalizing input and neutralizing output, with observra recording a metadata-only audit trail.",
+      "caption": "Runtime architecture: the local bridge proxies to the Exabeam MCP, screens what the agent reads, neutralizes what it writes back, and records a metadata-only audit trail"
+    }
+  ]
+}
