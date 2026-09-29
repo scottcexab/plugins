@@ -776,7 +776,31 @@ def doc_set(e):
         seen.add(src)
         slug = re.sub(r"-+", "-", gh_slug(re.sub(r"&.*?;", "", d["title"]))).strip("-") or Path(src).stem
         out.append({"slug": slug, "title": d["title"], "what": re.sub(r"<[^>]+>", "", d["what"]), "src": src})
+    if out and (pdir / "LICENSE").exists():
+        out.append({"slug": "license", "title": "License", "kind": "license", "src": "LICENSE",
+                    "what": "The terms this plugin is distributed under, and the open-source software it includes."})
     return out
+
+
+def legal_text_html(txt, resolve, skip_title=False):
+    """A plain-text legal file (LICENSE, NOTICE) laid out as page text, wording untouched: blank-line paragraphs,
+    an indented address on its own line as a link, web addresses linked, sibling license files linked."""
+    paras = [p for p in re.split(r"\n\s*\n", txt.strip()) if p.strip()]
+    if skip_title and paras:
+        paras = paras[1:]
+    out = []
+    for para in paras:
+        lines = para.splitlines()
+        short = len(lines) > 1 and all(len(ln.strip()) < 60 for ln in lines)          # a header block, not wrapped prose
+        body = ("<br>" if short else " ").join(html.escape(ln.strip(), quote=False) for ln in lines)
+        def link(m):
+            url = m.group(0).rstrip(".,;:")
+            return f'<a href="{url}">{url}</a>{m.group(0)[len(url):]}'
+        body = re.sub(r"https?://[^\s<>()]+", link, body)
+        body = re.sub(r"\b(LICENSE-APACHE|NOTICE)\b(?![^<]*</a>)", lambda m: f'<a href="{html.escape(resolve(m.group(1)))}"><code>{m.group(1)}</code></a>', body)
+        cls = ' class="lic-url"' if all(ln.startswith("    ") for ln in lines) else (' class="lic-copy"' if body.startswith("Copyright") else "")
+        out.append(f"<p{cls}>{body}</p>")
+    return "\n".join(out)
 
 
 def md_to_html(md, resolve, project="", name_as="the plugin"):
@@ -1221,6 +1245,7 @@ DOCS_CSS = """
 .doc td{padding:12px 16px;border-top:1px solid var(--line);vertical-align:top}
 .doc .figure{margin:8px 0 28px}.doc .figure p{margin:0}.doc .figure img,.doc img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px}
 .doc pre.mermaid{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px;text-align:center;margin:0 0 22px;overflow-x:auto}
+.doc .lic-url{margin:-4px 0 16px;padding-left:20px}.doc .lic-copy{color:var(--mute);font-size:15px;margin-top:24px}
 .pager{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:56px;padding-top:28px;border-top:1px solid var(--line)}
 .pager a{display:block;padding:18px 22px;border:2px solid var(--line);border-radius:12px;text-decoration:none;color:#000}
 .pager a:hover{border-color:var(--green)}.pager small{display:block;color:var(--mute);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
@@ -1270,7 +1295,13 @@ def docs_pages(catalog, e):
                 return f"{to_repo}{name}/{target}"
             return f"{REPO_URL}/blob/main/{name}/{target}" + (f"#{frag}" if frag else "")
 
-        body, heads = md_to_html((ROOT / name / pg["src"]).read_text(encoding="utf-8"), resolve, project, e["display"])
+        if pg.get("kind") == "license":
+            notice = ROOT / name / "NOTICE"
+            body = ('<h2 id="terms">Terms</h2>' + legal_text_html((ROOT / name / "LICENSE").read_text(encoding="utf-8"), resolve, skip_title=True)
+                    + ('<h2 id="notice">Notice</h2>' + legal_text_html(notice.read_text(encoding="utf-8"), resolve) if notice.exists() else ""))
+            heads = [(2, "terms", "Terms")] + ([(2, "notice", "Notice")] if notice.exists() else [])
+        else:
+            body, heads = md_to_html((ROOT / name / pg["src"]).read_text(encoding="utf-8"), resolve, project, e["display"])
         nav = ""
         for p in pages:
             on = p["slug"] == cur
@@ -1343,7 +1374,7 @@ def render(catalog, entries, listed):
     cards += f"""
     <article class="card pcard soon" id="coming-soon">
       <h3>More plugins coming soon</h3>
-      <p>More Exabeam plugins for third-party agent frameworks will land here as stable, reviewed plug-ins under the same terms. <a href="{REPO_URL}">Watch the repository</a> to see them arrive.</p>
+      <p>Check back here</p>
     </article>"""
     return head("Exabeam Plug-in Catalog", catalog.get("metadata", {}).get("description", "")) + f"""{header(announcement(entries, ''))}
 
@@ -1366,8 +1397,8 @@ def render(catalog, entries, listed):
 </div></section>
 
 <section class="band-gray" id="install"><div class="wrap">
-  <div class="center"><h2>Add the Plug-in Catalog <span class="grad">once</span></h2>
-  <p>A single command adds Exabeam's entire Plug-in Catalog to your AI agent, so every supported plugin is available to you at once. It works the same way in Claude Code and OpenAI Codex, and you only need to do it once.</p>
+  <div class="center"><h2>Add the entire plugin catalog <span class="grad">at once</span></h2>
+  <p>A single command adds Exabeam's entire Plug-in Catalog to your AI agent, so every supported plugin is available to you at once. It works the same way in Claude Code and OpenAI Codex.</p>
   <p>Each plugin has one install key in the format <code>&lt;plugin&gt;@{mp}</code>, and it's the same in both Claude Code and Codex. For example, the SOC plugin installs as <code>soc@{mp}</code> in either tool.</p></div>
   <div class="outlined">
     <div class="ocard"><button class="copy" type="button">Copy</button><h3>Claude Code</h3><pre>claude plugin marketplace add Exabeam-Labs/plugins</pre></div>
@@ -1376,7 +1407,7 @@ def render(catalog, entries, listed):
 </div></section>
 
 <section class="plugins" id="plugins"><div class="wrap">
-  <div class="center"><h2>Plugins Catalog</h2></div>
+  <div class="center"><h2>Plugin Catalog Listing</h2></div>
   <div class="cards">{cards}
   </div>
 </div></section>
