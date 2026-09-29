@@ -53,7 +53,7 @@ h2 .grad{background:linear-gradient(90deg,#009d00,#006bff 60%,#982cff);-webkit-b
 .points p{margin:0 0 30px;font-size:16px}.points p:last-child{margin:0}
 /* gray centered sections */
 .band-gray{background:var(--gray);padding:96px 0}
-.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}.center p+p{margin-top:14px}
+.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}.center p+p{margin-top:14px}.center.after-cards{margin:36px auto 0}
 .outlined{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 .outlined>*,.benefits .wrap>*{min-width:0}
 .ocard{border:2px solid var(--green);border-radius:16px;background:#fff;padding:32px 30px}
@@ -207,7 +207,15 @@ dialog.lightbox button{background:#fff;border:none;border-radius:40px;padding:7p
 .xa{background:linear-gradient(90deg,#009d00 0%,#00897a 55%,#006bff 100%);color:#fff;font-size:15px;font-weight:500;line-height:1.4}
 .xa .xa-in{max-width:1168px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:55px}
 .xa a{color:#fff;font-weight:600;text-decoration:underline}
-.xa button{flex:none;width:22px;height:22px;border:2px solid #fff;border-radius:3px;background:none;color:#fff;font:700 12px/1 sans-serif;cursor:pointer;padding:0}
+.xa .xa-close{flex:none;width:22px;height:22px;border:2px solid #fff;border-radius:3px;background:none;color:#fff;font:700 12px/1 sans-serif;cursor:pointer;padding:0}
+.xa-msg{display:flex;align-items:center;gap:18px;min-width:0}
+.xa-rot{display:grid;min-width:0}
+.xa-item{grid-area:1/1;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s}
+.xa-item.on{opacity:1;visibility:visible}
+.xa-dots{display:flex;gap:7px;flex:none}
+.xa-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid #fff;background:transparent;padding:0;cursor:pointer}
+.xa-dot.on{background:#fff}
+@media(prefers-reduced-motion:reduce){.xa-item{transition:none}}
 .xh{position:relative;z-index:60;background:#fff;font-size:16px;line-height:1.4}
 .xh a{text-decoration:none}.xh a:hover{text-decoration:none}
 .xh-in{max-width:1296px;margin:0 auto;padding:0 24px;height:95px;display:flex;align-items:center;gap:32px}
@@ -367,7 +375,8 @@ codex plugin add new@exabeam</pre></div></div></section></div>
  ],
  "version": "0.1.0",
  "status": "pre-release",
- "order": 100
+ "order": 100,
+ "added": "YYYY-MM-DD"
 }</script>
 <script>document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',()=>{
   const pre=b.closest('.codeblock').querySelector('pre').cloneNode(true);pre.querySelectorAll('.c').forEach(c=>c.remove());
@@ -379,7 +388,15 @@ xh.querySelector('.xh-burger').addEventListener('click',e=>{const on=xh.classLis
 xh.querySelector('.xh-find').addEventListener('click',e=>{closeAll();const on=xh.classList.toggle('searching');if(on)xh.querySelector('.xh-search input').focus();e.stopPropagation()});
 document.addEventListener('click',e=>{if(!xh.contains(e.target)){closeAll();xh.classList.remove('searching')}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();xh.classList.remove('searching','open')}});
-const xa=document.querySelector('.xa button');xa&&xa.addEventListener('click',()=>xa.closest('.xa').remove());
+const xa=document.querySelector('.xa-close');xa&&xa.addEventListener('click',()=>xa.closest('.xa').remove());
+const items=[...document.querySelectorAll('.xa-item')],dots=[...document.querySelectorAll('.xa-dot')];
+if(items.length>1){let cur=0,timer=null;const bar=document.querySelector('.xa');
+const show=n=>{cur=(n+items.length)%items.length;items.forEach((it,i)=>{const on=i===cur;it.classList.toggle('on',on);it.toggleAttribute('aria-hidden',!on);
+it.querySelectorAll('a').forEach(a=>on?a.removeAttribute('tabindex'):a.setAttribute('tabindex','-1'))});dots.forEach((d,i)=>d.classList.toggle('on',i===cur))};
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const play=()=>{if(!still&&!timer)timer=setInterval(()=>show(cur+1),6000)},stop=()=>{clearInterval(timer);timer=null};
+dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);stop();play()}));
+bar.addEventListener('mouseenter',stop);bar.addEventListener('mouseleave',play);bar.addEventListener('focusin',stop);bar.addEventListener('focusout',play);play();}
 const links=[...document.querySelectorAll('.xs a')];if(!links.length)return;
 const pairs=links.map(a=>[a,document.querySelector(a.getAttribute('href'))]).filter(p=>p[1]);
 let queued=false;const mark=()=>{queued=false;let cur=pairs[0];

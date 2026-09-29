@@ -52,7 +52,7 @@ h2 .grad{background:linear-gradient(90deg,#009d00,#006bff 60%,#982cff);-webkit-b
 .points p{margin:0 0 30px;font-size:16px}.points p:last-child{margin:0}
 /* gray centered sections */
 .band-gray{background:var(--gray);padding:96px 0}
-.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}.center p+p{margin-top:14px}
+.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}.center p+p{margin-top:14px}.center.after-cards{margin:36px auto 0}
 .outlined{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 .outlined>*,.benefits .wrap>*{min-width:0}
 .ocard{border:2px solid var(--green);border-radius:16px;background:#fff;padding:32px 30px}
@@ -206,7 +206,15 @@ dialog.lightbox button{background:#fff;border:none;border-radius:40px;padding:7p
 .xa{background:linear-gradient(90deg,#009d00 0%,#00897a 55%,#006bff 100%);color:#fff;font-size:15px;font-weight:500;line-height:1.4}
 .xa .xa-in{max-width:1168px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:55px}
 .xa a{color:#fff;font-weight:600;text-decoration:underline}
-.xa button{flex:none;width:22px;height:22px;border:2px solid #fff;border-radius:3px;background:none;color:#fff;font:700 12px/1 sans-serif;cursor:pointer;padding:0}
+.xa .xa-close{flex:none;width:22px;height:22px;border:2px solid #fff;border-radius:3px;background:none;color:#fff;font:700 12px/1 sans-serif;cursor:pointer;padding:0}
+.xa-msg{display:flex;align-items:center;gap:18px;min-width:0}
+.xa-rot{display:grid;min-width:0}
+.xa-item{grid-area:1/1;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s}
+.xa-item.on{opacity:1;visibility:visible}
+.xa-dots{display:flex;gap:7px;flex:none}
+.xa-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid #fff;background:transparent;padding:0;cursor:pointer}
+.xa-dot.on{background:#fff}
+@media(prefers-reduced-motion:reduce){.xa-item{transition:none}}
 .xh{position:relative;z-index:60;background:#fff;font-size:16px;line-height:1.4}
 .xh a{text-decoration:none}.xh a:hover{text-decoration:none}
 .xh-in{max-width:1296px;margin:0 auto;padding:0 24px;height:95px;display:flex;align-items:center;gap:32px}
@@ -292,7 +300,7 @@ dialog.lightbox button{background:#fff;border:none;border-radius:40px;padding:7p
 </style>
 </head>
 <body>
-<div class="xa"><div class="xa-in"><span><strong>Exabeam Agentic SOC plugin</strong> is in the catalog, <a href="plugins/soc/">View details</a></span><button type="button" aria-label="Dismiss">✕</button></div></div>
+<div class="xa"><div class="xa-in"><div class="xa-msg"><span class="xa-rot" aria-live="polite"><span class="xa-item on"><strong>Exabeam Agentic SOC plugin</strong> is in the catalog, <a href="plugins/soc/">View details</a></span></span></div><button type="button" class="xa-close" aria-label="Dismiss">✕</button></div></div>
 <header class="xh"><div class="xh-in">
   <a class="xh-logo" href="https://www.exabeam.com/" aria-label="Exabeam"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyOTkuMTYgNTEuMzQiPjxkZWZzPjxzdHlsZT4uY2xzLTF7ZmlsbDojMDA2YmZmO30uY2xzLTEsLmNscy0yLC5jbHMtM3tzdHJva2Utd2lkdGg6MHB4O30uY2xzLTJ7ZmlsbDojMDA5ZDAwO30uY2xzLTN7ZmlsbDojMDAwO308L3N0eWxlPjwvZGVmcz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0yMS43NCw0NC41M0w0NS42MywxMS41OWw0LjIsNS43OS0xOS42OSwyNy4xNWgtOC40Wk04LjQsNTEuMzRMNDEuNDIsNS43OWwtNC4yLTUuNzlMMCw1MS4zNGg4LjRaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNjMuNzUsNDQuNTNsMi44OC0zLjk4LTQuMi01Ljc5LTcuMDgsOS43N2g4LjRaTTQyLjAxLDUxLjM0bDE2LjIyLTIyLjM3LTQuMi01Ljc5LTIwLjQyLDI4LjE3aDguNFoiLz48cGF0aCBjbGFzcz0iY2xzLTMiIGQ9Ik0yODEuNzUsMTUuNDJjLTMuNTIsMC01LjgyLjg3LTguNDIsMi4zLTEuMTgtMS40My0zLjA2LTIuMy01Ljk3LTIuM3MtNS4xNSwxLjA3LTcuMywyLjQ1di0yLjA5aC02LjQ4djI4Ljc5aDYuNzR2LTIxLjY5YzIuMDktMS4xMiwzLjYyLTEuNjksNC43LTEuNjksMi44NiwwLDMuNTIsMS4wMiwzLjUyLDQuOTV2MTguNDJoNi43NHYtMTguNDJjMC0xLjI3LS4wNS0yLjU1LS4yMS0zLjY3LDEuODQtLjk3LDMuNzgtMS4yNyw0Ljc1LTEuMjcsMi44NiwwLDMuNjcsMS4wMiwzLjY3LDQuOTV2MTguNDJoNi43NHYtMTguNDJjMC01Ljk3LTEuNTMtMTAuNzItOC40Ny0xMC43MiIvPjxwYXRoIGNsYXNzPSJjbHMtMyIgZD0iTTE4NC4zNSwzMS42OGMwLDQuMTgtMS4wNyw3LjMtNS40Niw3LjNoLTQuOXYtMTcuNjljMS40My0uMjEsMy42Ny0uMzYsNC45LS4zNiw0LjM5LDAsNS40NiwzLjExLDUuNDYsNy4zdjMuNDVoMFpNMTc4Ljg4LDE1LjQyYy0xLjIyLDAtMy4wMS4xLTQuOS4zNlY1LjcyaC02Ljc0djM4Ljc3aDExLjY0YzguMjIsMCwxMi4yLTQuODUsMTIuMi0xMi44MXYtMy40NWMwLTcuOTYtMy45OC0xMi44MS0xMi4yLTEyLjgxIi8+PHBhdGggY2xhc3M9ImNscy0zIiBkPSJNOTYuNDIsMjcuNzJoLTEwLjgydi0uMjFjMC00LjAzLDIuMy02LjI4LDUuNDYtNi4yOHM1LjM2LDIuMyw1LjM2LDYuMjh2LjIxaDBaTTkxLjA2LDE1LjQyYy03LjgxLDAtMTIuMjUsNS0xMi4yNSwxMi45NnYzLjc4YzAsMTAuMDYsNy4yNSwxMi44MSwxMi4zNSwxMi44MSwzLjc3LDAsNS43OC0uMTcsOC4yMi0uNTdoLjAzYy41My0uMDksMS4wNy0uMTksMS42Ni0uMjkuMDIsMCwuMDMsMCwuMDUtLjAxbDEuMDEtLjE4di0uOWMwLS4wOCwwLS4xNSwwLS4yNHYtMy4zN3MwLS4wNCwwLS4wNnYtLjc5bC0xLjA1LjA5aC0uMDJjLS4xLjAxLS4xOS4wMi0uMjkuMDNsLTEuNi4xNGMtMi4wNi4xNy00LjcyLjM0LTcuNDkuMzQtNC45LDAtNi4xMy0zLjUyLTYuMTMtNi40OHYtLjE1aDE3LjY2di00LjE0YzAtNy42MS00LjI5LTEyLjk2LTEyLjE1LTEyLjk2Ii8+PHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMjEzLjQ0LDI3LjcyaC0xMC44MnYtLjIxYzAtNC4wMywyLjMtNi4yOCw1LjQ2LTYuMjhzNS4zNiwyLjMsNS4zNiw2LjI4di4yMWgwWk0yMDguMDgsMTUuNDJjLTcuODEsMC0xMi4yNSw1LTEyLjI1LDEyLjk2djMuNzhjMCwxMC4wNiw3LjI1LDEyLjgxLDEyLjM1LDEyLjgxLDMuNzcsMCw1Ljc4LS4xNyw4LjIyLS41N2guMDNjLjUzLS4wOSwxLjA3LS4xOSwxLjY2LS4yOS4wMiwwLC4wMywwLC4wNS0uMDFsMS4wMS0uMTh2LS45YzAtLjA4LDAtLjE1LDAtLjI0di0zLjM3czAtLjA0LDAtLjA2di0uNzlsLTEuMDUuMDloLS4wMmMtLjEuMDEtLjE5LjAyLS4yOS4wM2wtMS42LjE0Yy0yLjA2LjE3LTQuNzIuMzQtNy40OS4zNC00LjksMC02LjEzLTMuNTItNi4xMy02LjQ4di0uMTVoMTcuNjZ2LTQuMTRjMC03LjYxLTQuMjktMTIuOTYtMTIuMTUtMTIuOTYiLz48cGF0aCBjbGFzcz0iY2xzLTMiIGQ9Ik0xNTMuMzYsMzguMThjLTEuNDguODItMy4zNywxLjQzLTUuMjEsMS40My0yLjU1LDAtMy42Ny0uNjYtMy42Ny0zLjE3di0uMjFjMC0yLjg2LDEuMDItNC4zNCw1LjY3LTQuMzRoMy4yMnY2LjI4aDBaTTE0OC44NywxNS40MmMtMy4xLDAtNS43Ny4zMi03Ljc2LjY3aDBsLS4zMS4wNmMtLjE2LjAzLS4zMS4wNi0uNDUuMDksMCwwLS4wMSwwLS4wMSwwbC0uOTQuMTh2Ljc0cy0uMDEuMDktLjAxLjE0djMuMjdzMCwuMDkuMDEuMTN2Ljg1bDEuNzMtLjE2aDBjMS44LS4xOSw0LjgyLS4zNiw3Ljc2LS4zNnM0LjQ5LjgyLDQuNDksNC4xNHYyLjI1aC0zLjIyYy04Ljg4LDAtMTIuNDUsMy4wMS0xMi40NSw4Ljgzdi4yMWMwLDYuODksNC41OSw4LjUyLDguODMsOC41MiwyLjQ1LDAsNC44NS0uODIsNy4yLTIuMjV2MS44NGg2LjM4di0xOS4zOWMwLTYuNTMtMy45OC05Ljc1LTExLjIzLTkuNzUiLz48cGF0aCBjbGFzcz0iY2xzLTMiIGQ9Ik0yNDAuMzgsMzguMThjLTEuNDguODItMy4zNywxLjQzLTUuMjEsMS40My0yLjU1LDAtMy42Ny0uNjYtMy42Ny0zLjE3di0uMjFjMC0yLjg2LDEuMDItNC4zNCw1LjY3LTQuMzRoMy4yMnY2LjI4aDBaTTIzNS44OSwxNS40MmMtMy4xLDAtNS43Ny4zMi03Ljc2LjY3aDBsLS4zMS4wNmMtLjE2LjAzLS4zMS4wNi0uNDUuMDksMCwwLS4wMSwwLS4wMSwwbC0uOTQuMTh2Ljc0cy0uMDEuMDktLjAxLjE0djMuMjdzMCwuMDkuMDEuMTN2Ljg1bDEuNzMtLjE2aDBjMS44LS4xOSw0LjgyLS4zNiw3Ljc2LS4zNnM0LjQ5LjgyLDQuNDksNC4xNHYyLjI1aC0zLjIyYy04Ljg4LDAtMTIuNDYsMy4wMS0xMi40Niw4Ljgzdi4yMWMwLDYuODksNC41OSw4LjUyLDguODMsOC41MiwyLjQ1LDAsNC44NS0uODIsNy4yLTIuMjV2MS44NGg2LjM4di0xOS4zOWMwLTYuNTMtMy45OC05Ljc1LTExLjIzLTkuNzUiLz48cG9seWdvbiBjbGFzcz0iY2xzLTMiIHBvaW50cz0iMTI3LjI4IDE1Ljc4IDEyMC4zIDI1LjM3IDExMy4zMyAxNS43OCAxMDYuMzQgMTUuNzggMTE2LjgxIDMwLjE3IDEwNi4zNCA0NC41NyAxMTMuMzMgNDQuNTcgMTIwLjMgMzQuOTcgMTI3LjI4IDQ0LjU3IDEzNC4yNiA0NC41NyAxMjMuOCAzMC4xNyAxMzQuMjYgMTUuNzggMTI3LjI4IDE1Ljc4IDEyNy4yOCAxNS43OCIvPjxwYXRoIGNsYXNzPSJjbHMtMyIgZD0iTTI5NS4xMiwxNy4xNGgtMS4wMnYyLjU2aC0uODZ2LTIuNTZoLTEuMDJ2LS43M2gyLjl2LjczWk0yOTkuMTYsMTYuNDF2My4yOGgtLjgxdi0yLjMxaC0uMDJsLS42MSwyLjMxaC0uNzlsLS42MS0yLjMzaC0uMDJ2Mi4zM2gtLjgxdi0zLjI4aDEuMTdsLjY5LDIuMzkuNjMtMi4zOWgxLjE3WiIvPjwvc3ZnPg==" alt="Exabeam"></a>
   <button class="xh-burger" type="button" aria-label="Menu" aria-expanded="false" aria-controls="xh-menu"><span></span><span></span><span></span></button>
@@ -335,11 +343,13 @@ dialog.lightbox button{background:#fff;border:none;border-radius:40px;padding:7p
 <section class="band-gray" id="install"><div class="wrap">
   <div class="center"><h2>Add the entire plugin catalog <span class="grad">at once</span></h2>
   <p>A single command adds Exabeam's entire Plug-in Catalog to your AI agent, so every supported plugin is available to you at once. It works the same way in Claude Code and OpenAI Codex.</p>
-  <p>Each plugin has one install key in the format <code>&lt;plugin&gt;@exabeam</code>, and it's the same in both Claude Code and Codex. For example, the SOC plugin installs as <code>soc@exabeam</code> in either tool.</p></div>
+</div>
   <div class="outlined">
     <div class="ocard"><button class="copy" type="button">Copy</button><h3>Claude Code</h3><pre>claude plugin marketplace add Exabeam-Labs/plugins</pre></div>
     <div class="ocard b"><button class="copy" type="button">Copy</button><h3>OpenAI Codex</h3><pre>codex plugin marketplace add Exabeam-Labs/plugins</pre></div>
   </div>
+  <div class="center after-cards">
+  <p>Each plugin has one install key in the format <code>&lt;plugin&gt;@exabeam</code>, and it's the same in both Claude Code and Codex. For example, the SOC plugin installs as <code>soc@exabeam</code> in either tool.</p></div>
 </div></section>
 
 <section class="plugins" id="plugins"><div class="wrap">
@@ -361,7 +371,7 @@ dialog.lightbox button{background:#fff;border:none;border-radius:40px;padding:7p
   </div>
 </div></section>
 
-<section class="cta"><div class="wrap"><strong>Governed by the Exabeam Enterprise Agreement</strong><a class="btn btn-white" href="#terms">Read the Terms</a></div></section>
+<section class="cta"><div class="wrap"><strong>Governed by the Exabeam Enterprise Agreement</strong></div></section>
 
 <section class="benefits terms" id="terms"><div class="wrap">
   <div><h2>Terms and <span class="g">licensing</span></h2></div>
@@ -401,7 +411,15 @@ xh.querySelector('.xh-burger').addEventListener('click',e=>{const on=xh.classLis
 xh.querySelector('.xh-find').addEventListener('click',e=>{closeAll();const on=xh.classList.toggle('searching');if(on)xh.querySelector('.xh-search input').focus();e.stopPropagation()});
 document.addEventListener('click',e=>{if(!xh.contains(e.target)){closeAll();xh.classList.remove('searching')}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();xh.classList.remove('searching','open')}});
-const xa=document.querySelector('.xa button');xa&&xa.addEventListener('click',()=>xa.closest('.xa').remove());
+const xa=document.querySelector('.xa-close');xa&&xa.addEventListener('click',()=>xa.closest('.xa').remove());
+const items=[...document.querySelectorAll('.xa-item')],dots=[...document.querySelectorAll('.xa-dot')];
+if(items.length>1){let cur=0,timer=null;const bar=document.querySelector('.xa');
+const show=n=>{cur=(n+items.length)%items.length;items.forEach((it,i)=>{const on=i===cur;it.classList.toggle('on',on);it.toggleAttribute('aria-hidden',!on);
+it.querySelectorAll('a').forEach(a=>on?a.removeAttribute('tabindex'):a.setAttribute('tabindex','-1'))});dots.forEach((d,i)=>d.classList.toggle('on',i===cur))};
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const play=()=>{if(!still&&!timer)timer=setInterval(()=>show(cur+1),6000)},stop=()=>{clearInterval(timer);timer=null};
+dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);stop();play()}));
+bar.addEventListener('mouseenter',stop);bar.addEventListener('mouseleave',play);bar.addEventListener('focusin',stop);bar.addEventListener('focusout',play);play();}
 const links=[...document.querySelectorAll('.xs a')];if(!links.length)return;
 const pairs=links.map(a=>[a,document.querySelector(a.getAttribute('href'))]).filter(p=>p[1]);
 let queued=false;const mark=()=>{queued=false;let cur=pairs[0];
