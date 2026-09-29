@@ -32,7 +32,9 @@ Sources, nothing hand-written per plugin:
   site/<entry>.json                   optional, site-only facts the payload does not carry: "status" (the card's
                                       release pill, "pre-release" or "released"; read from the README's Status
                                       section when absent), "card_description" (the card's text, up to 400
-                                      characters; the catalog description, fitted to 400, when absent) and the
+                                      characters; the catalog description, fitted to 400, when absent), "added"
+                                      (YYYY-MM-DD, orders the announcement bar's up-to-five newest plugins; the
+                                      vendored date in vendor.lock.json when absent) and the
                                       detail page's images, "media": [{"src", "alt", "caption"}], src relative to
                                       the repo root.
 """
@@ -262,6 +264,7 @@ def load():
             "category": e.get("category", ""), "license": e.get("license", ""), "short": ident.get("shortDescription", ""),
             "version": rec.get("version") or ident.get("version", ""), "sha": rec.get("sha") or "",
             "blessed": rec.get("vendored", ""), "blessed_by": rec.get("blessed_by", ""), "release": rec.get("release", ""),
+            "added": site_cfg.get("added") or rec.get("vendored", ""),
             "upstream": upstream, "hosts": hosts, "skills": skills, "media": media, "site_status": site_cfg.get("status", ""),
             "card_description": site_cfg.get("card_description", ""),
             "readme": readme_content(pdir, name, {s["name"] for s in skills}, upstream.rsplit("/", 1)[-1] if upstream else ""),
@@ -389,7 +392,15 @@ HEADER_CSS = """
 .xa{background:linear-gradient(90deg,#009d00 0%,#00897a 55%,#006bff 100%);color:#fff;font-size:15px;font-weight:500;line-height:1.4}
 .xa .xa-in{max-width:1168px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:55px}
 .xa a{color:#fff;font-weight:600;text-decoration:underline}
-.xa button{flex:none;width:22px;height:22px;border:2px solid #fff;border-radius:3px;background:none;color:#fff;font:700 12px/1 sans-serif;cursor:pointer;padding:0}
+.xa .xa-close{flex:none;width:22px;height:22px;border:2px solid #fff;border-radius:3px;background:none;color:#fff;font:700 12px/1 sans-serif;cursor:pointer;padding:0}
+.xa-msg{display:flex;align-items:center;gap:18px;min-width:0}
+.xa-rot{display:grid;min-width:0}
+.xa-item{grid-area:1/1;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s}
+.xa-item.on{opacity:1;visibility:visible}
+.xa-dots{display:flex;gap:7px;flex:none}
+.xa-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid #fff;background:transparent;padding:0;cursor:pointer}
+.xa-dot.on{background:#fff}
+@media(prefers-reduced-motion:reduce){.xa-item{transition:none}}
 .xh{position:relative;z-index:60;background:#fff;font-size:16px;line-height:1.4}
 .xh a{text-decoration:none}.xh a:hover{text-decoration:none}
 .xh-in{max-width:1296px;margin:0 auto;padding:0 24px;height:95px;display:flex;align-items:center;gap:32px}
@@ -450,7 +461,15 @@ xh.querySelector('.xh-burger').addEventListener('click',e=>{const on=xh.classLis
 xh.querySelector('.xh-find').addEventListener('click',e=>{closeAll();const on=xh.classList.toggle('searching');if(on)xh.querySelector('.xh-search input').focus();e.stopPropagation()});
 document.addEventListener('click',e=>{if(!xh.contains(e.target)){closeAll();xh.classList.remove('searching')}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();xh.classList.remove('searching','open')}});
-const xa=document.querySelector('.xa button');xa&&xa.addEventListener('click',()=>xa.closest('.xa').remove());
+const xa=document.querySelector('.xa-close');xa&&xa.addEventListener('click',()=>xa.closest('.xa').remove());
+const items=[...document.querySelectorAll('.xa-item')],dots=[...document.querySelectorAll('.xa-dot')];
+if(items.length>1){let cur=0,timer=null;const bar=document.querySelector('.xa');
+const show=n=>{cur=(n+items.length)%items.length;items.forEach((it,i)=>{const on=i===cur;it.classList.toggle('on',on);it.toggleAttribute('aria-hidden',!on);
+it.querySelectorAll('a').forEach(a=>on?a.removeAttribute('tabindex'):a.setAttribute('tabindex','-1'))});dots.forEach((d,i)=>d.classList.toggle('on',i===cur))};
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const play=()=>{if(!still&&!timer)timer=setInterval(()=>show(cur+1),6000)},stop=()=>{clearInterval(timer);timer=null};
+dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);stop();play()}));
+bar.addEventListener('mouseenter',stop);bar.addEventListener('mouseleave',play);bar.addEventListener('focusin',stop);bar.addEventListener('focusout',play);play();}
 const links=[...document.querySelectorAll('.xs a')];if(!links.length)return;
 const pairs=links.map(a=>[a,document.querySelector(a.getAttribute('href'))]).filter(p=>p[1]);
 let queued=false;const mark=()=>{queued=false;let cur=pairs[0];
@@ -478,7 +497,7 @@ def header(announce=""):
             colhtml += f'<div class="xh-col"><h4>{h(head)}</h4>{anchors}{extra}</div>'
         items += (f'<li class="xh-item"><button class="xh-top" type="button" aria-expanded="false" aria-controls="xh-p{i}">{h(label)}</button>'
                   f'<div class="xh-panel" id="xh-p{i}"><div class="xh-panel-in"><div class="xh-intro"><h3>{h(title)}</h3><p>{h(intro)}</p></div>{colhtml}</div></div></li>')
-    bar = f'<div class="xa"><div class="xa-in"><span>{announce}</span><button type="button" aria-label="Dismiss">✕</button></div></div>' if announce else ""
+    bar = f'<div class="xa"><div class="xa-in"><div class="xa-msg">{announce}</div><button type="button" class="xa-close" aria-label="Dismiss">✕</button></div></div>' if announce else ""
     return f"""{bar}
 <header class="xh"><div class="xh-in">
   <a class="xh-logo" href="{EXABEAM}/" aria-label="Exabeam"><img src="{logo}" alt="Exabeam"></a>
@@ -503,10 +522,27 @@ def subnav(items):
         f'<a href="#{html.escape(i)}">{html.escape(t)}</a>' for i, t in items) + "</div></nav>"
 
 
-def announcement(entries, root):
-    e = entries[0] if entries else None
-    return (f'<strong>{html.escape(e["display"])}</strong> is in the catalog, <a href="{root}plugins/{html.escape(e["name"])}/">View details</a>'
-            if e else "")
+ANNOUNCE_MAX = 5          # up to this many: fewer plugins, fewer messages
+
+
+def announcement(listed, root):
+    """The announcement bar's messages: the ANNOUNCE_MAX newest listed plugins, newest first. "Newest" is the card's
+    "added" date (site/<name>.json "added", else the vendored date in vendor.lock.json; a hand-authored page sets
+    it in its card JSON); plugins without one come after, in listing order. One message sits still; more rotate."""
+    order = {id(c): i for i, (c, _) in enumerate(listed)}
+    date = lambda c: c.get("added") if re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(c.get("added") or "")) else ""   # a placeholder counts as undated
+    newest = sorted(listed, key=lambda t: (date(t[0]), -order[id(t[0])]), reverse=True)[:ANNOUNCE_MAX]
+    if not newest:
+        return ""
+    items = ""
+    for i, (c, href) in enumerate(newest):            # only the first shows until the script rotates
+        cls, hidden, tab = (" on", "", "") if i == 0 else ("", ' aria-hidden="true"', ' tabindex="-1"')
+        items += (f'<span class="xa-item{cls}"{hidden}><strong>{h(c["display"])}</strong> is in the catalog, '
+                  f'<a href="{root}{h(href)}"{tab}>View details</a></span>')
+    dots = "" if len(newest) < 2 else '<span class="xa-dots">' + "".join(
+        f'<button type="button" class="xa-dot{" on" if i == 0 else ""}" aria-label="Show {h(c["display"])}"></button>'
+        for i, (c, _) in enumerate(newest)) + "</span>"
+    return f'<span class="xa-rot" aria-live="polite">{items}</span>{dots}'
 
 
 FOOTER_CSS = """
@@ -649,7 +685,7 @@ def card_data(e):
     return {"name": e["name"], "display": e["display"], "category": category(e),
             "short": card_description(e),
             "hosts": [HOST_LABELS.get(x, x) for x in e["hosts"]], "skills": len(e["skills"]),
-            "skill_names": [x["name"] for x in e["skills"]], "version": e["version"],
+            "skill_names": [x["name"] for x in e["skills"]], "version": e["version"], "added": e["added"],
             "status": release_status(e)}
 
 
@@ -968,7 +1004,7 @@ h2 .grad{background:linear-gradient(90deg,#009d00,#006bff 60%,#982cff);-webkit-b
 .points p{margin:0 0 30px;font-size:16px}.points p:last-child{margin:0}
 /* gray centered sections */
 .band-gray{background:var(--gray);padding:96px 0}
-.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}.center p+p{margin-top:14px}
+.center{text-align:center;max-width:900px;margin:0 auto 56px}.center p{margin:0;font-size:17px}.center p+p{margin-top:14px}.center.after-cards{margin:36px auto 0}
 .outlined{display:grid;grid-template-columns:1fr 1fr;gap:32px}
 .outlined>*,.benefits .wrap>*{min-width:0}
 .ocard{border:2px solid var(--green);border-radius:16px;background:#fff;padding:32px 30px}
@@ -1183,7 +1219,8 @@ def template_page():
     (remove "draft") and the sections. The listing picks it up on the next build."""
     data = {"draft": True, "name": "new", "display": "New plugin name", "category": "Security",
             "short": "One sentence on what the plugin does.", "hosts": ["Claude Code", "OpenAI Codex"],
-            "skills": 0, "skill_names": ["first-skill"], "version": "0.1.0", "status": "pre-release", "order": 100}
+            "skills": 0, "skill_names": ["first-skill"], "version": "0.1.0", "status": "pre-release", "order": 100,
+            "added": "YYYY-MM-DD"}
     sections = """
   <section id="overview"><div class="kicker">Overview</div><h2>What it is</h2><div class="overview"><p>Describe the plugin.</p></div></section>
   <section id="install"><div class="kicker">Install</div><h2>Get started</h2><div class="grid2">""" + codeblock("Claude Code", "claude plugin marketplace add Exabeam-Labs/plugins\nclaude plugin install new@exabeam") + codeblock("OpenAI Codex", "codex plugin marketplace add Exabeam-Labs/plugins\ncodex plugin add new@exabeam") + """</div></section>"""
@@ -1376,7 +1413,7 @@ def render(catalog, entries, listed):
       <h3>More plugins coming soon</h3>
       <p>Check back here</p>
     </article>"""
-    return head("Exabeam Plug-in Catalog", catalog.get("metadata", {}).get("description", "")) + f"""{header(announcement(entries, ''))}
+    return head("Exabeam Plug-in Catalog", catalog.get("metadata", {}).get("description", "")) + f"""{header(announcement(listed, ''))}
 
 <main>
 <section class="hero">
@@ -1399,11 +1436,13 @@ def render(catalog, entries, listed):
 <section class="band-gray" id="install"><div class="wrap">
   <div class="center"><h2>Add the entire plugin catalog <span class="grad">at once</span></h2>
   <p>A single command adds Exabeam's entire Plug-in Catalog to your AI agent, so every supported plugin is available to you at once. It works the same way in Claude Code and OpenAI Codex.</p>
-  <p>Each plugin has one install key in the format <code>&lt;plugin&gt;@{mp}</code>, and it's the same in both Claude Code and Codex. For example, the SOC plugin installs as <code>soc@{mp}</code> in either tool.</p></div>
+</div>
   <div class="outlined">
     <div class="ocard"><button class="copy" type="button">Copy</button><h3>Claude Code</h3><pre>claude plugin marketplace add Exabeam-Labs/plugins</pre></div>
     <div class="ocard b"><button class="copy" type="button">Copy</button><h3>OpenAI Codex</h3><pre>codex plugin marketplace add Exabeam-Labs/plugins</pre></div>
   </div>
+  <div class="center after-cards">
+  <p>Each plugin has one install key in the format <code>&lt;plugin&gt;@{mp}</code>, and it's the same in both Claude Code and Codex. For example, the SOC plugin installs as <code>soc@{mp}</code> in either tool.</p></div>
 </div></section>
 
 <section class="plugins" id="plugins"><div class="wrap">
@@ -1412,7 +1451,7 @@ def render(catalog, entries, listed):
   </div>
 </div></section>
 
-<section class="cta"><div class="wrap"><strong>Governed by the Exabeam Enterprise Agreement</strong><a class="btn btn-white" href="#terms">Read the Terms</a></div></section>
+<section class="cta"><div class="wrap"><strong>Governed by the Exabeam Enterprise Agreement</strong></div></section>
 
 <section class="benefits terms" id="terms"><div class="wrap">
   <div><h2>Terms and <span class="g">licensing</span></h2></div>
